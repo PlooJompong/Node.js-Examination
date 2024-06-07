@@ -1,7 +1,7 @@
 import db from "../database/database.js";
 
-// Function for cart
-const addToCart = async (req, res, next) => {
+// Add to cart
+const addToCart = async (req, res) => {
   const productID = req.body.product;
   const cartID = req.body.cartID;
   const quantity = req.body.quantity ? req.body.quantity : 1;
@@ -11,9 +11,7 @@ const addToCart = async (req, res, next) => {
     ...coffeeQuery,
     quantity: quantity,
   };
-  // Check if cartID is provided
   if (cartID) {
-    // Check if cartID is in database
     const cartQuery = await db["cart"].findOne({ _id: cartID });
     // Check if product is already added
     const productExists = cartQuery.product.some(
@@ -102,7 +100,7 @@ const showCart = async (req, res) => {
 };
 
 // Place order
-const placeOrder = async (req, res, next) => {
+const placeOrder = async (req, res) => {
   const { customerID, cartID, guestInfo } = req.body;
   const orderTime = formatDate(new Date());
 
@@ -154,6 +152,7 @@ const placeOrder = async (req, res, next) => {
           new Date(Date.now() + 20 * 60 * 1000)
         );
 
+        // Calculate total price
         cart.product.forEach((product) => {
           price = price + product.quantity * product.price;
         });
@@ -180,7 +179,6 @@ const placeOrder = async (req, res, next) => {
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
-  next();
 };
 
 // Format date
@@ -195,42 +193,40 @@ const formatDate = (date) => {
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 };
 
-const deleteOrder = async (cartID) => {
+const deleteOrder = async (req, res) => {
+  const { cartID } = req.body
   try {
-    console.log("searching for item with cartID:", cartID);
     const cartItem = await db["cart"].findOne({ _id: cartID });
-    console.log("THE CART ITEM", cartItem);
     if (!cartItem) {
-      throw new Error("Item not found");
+      return res.status(400).json({ message: "Cart not found" });
     }
 
     const deleteCart = await db["cart"].remove({ _id: cartID }, {});
-    console.log("Item removed", deleteCart);
 
-    return deleteCart;
+    res.json({ success: `successfully delete cart ${cartID}` });
   } catch (error) {
     console.error("Error removing item from cart", error);
     throw error;
   }
 };
 
-const deleteItemInOrder = async (cartID, productID) => {
+
+const deleteItemInOrder = async (req, res) => {
+  const { cartID, productID } = req.body
   try {
     const cartItem = await db["cart"].findOne({ _id: cartID });
 
     if (!cartItem) {
-      throw new Error('Cart not found')
+      return res.status(400).json({ message: "Cart not found" })
     }
 
     const productExists = cartItem.product.some(p => p._id === productID)
 
     if (!productExists) {
-      throw new Error("Product not found in cart")
+      return res.status(400).json({ message: "Product not found in cart" })
     }
 
     const updateProducts = cartItem.product.filter(p => p._id !== productID)
-
-    console.log("updateProducts", updateProducts)
 
     const numUpdated = await db["cart"].update(
       { _id: cartID },
@@ -238,6 +234,7 @@ const deleteItemInOrder = async (cartID, productID) => {
       {}
     );
 
+    res.json({ updateCart: updateProducts })
   } catch (error) {
     console.error("Error removing specific item from cart", error)
     throw error

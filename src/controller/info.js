@@ -1,14 +1,12 @@
 import db from "../database/database.js";
 
-const getCompanyInfo = async () => {
-    try {
-        console.log("Trying to get company info")
-        const companyInfo = await db["company"].find({})
-        console.log("GOT company info")
-        return companyInfo
-    } catch (error) {
-        console.error(error)
-    }
+const getCompanyInfo = async (req, res) => {
+  try {
+    const companyInfo = await db["company"].find({})
+    res.json({ Info: companyInfo[0].info })
+  } catch (error) {
+    res.status(500).send({ error: 'Could find company info' });
+  }
 }
 
 export { getCompanyInfo }

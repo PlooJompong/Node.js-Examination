@@ -7,7 +7,7 @@ import loggerMiddleware from "./src/middleware/logger.js";
 import notFoundMiddleware from "./src/middleware/notFound.js";
 import errorHandlerMiddleware from "./src/middleware/errorHandler.js";
 
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 
 const app = express();
 global.currentUser = '';

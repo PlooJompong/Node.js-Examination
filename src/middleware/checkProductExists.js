@@ -13,12 +13,9 @@ const checkProductExists = async (req, res, next) => {
     const productQuery = await db.menu.findOne({ _id: product });
 
     if (!productQuery) {
-      return res
-        .status(404)
-        .json({ error: "Product not found in the database" });
+      return res.status(404).json({ error: "Product not found in the database" });
     }
   } catch (error) {
-    console.error("Error querying the database:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
   if (cartID && customerID) {
@@ -33,7 +30,6 @@ const checkProductExists = async (req, res, next) => {
         });
       }
     } catch (error) {
-      console.error("Error querying the database:", error);
       return res.status(500).json({ error: "Internal server error" });
     }
   } else {
@@ -44,7 +40,6 @@ const checkProductExists = async (req, res, next) => {
           return res.status(404).json({ error: "Cart not found in database" });
         }
       } catch (error) {
-        console.error("Error querying the database:", error);
         return res.status(500).json({ error: "Internal server error" });
       }
     }
@@ -52,12 +47,9 @@ const checkProductExists = async (req, res, next) => {
       try {
         const customerQuery = await db.customers.findOne({ _id: customerID });
         if (!customerQuery) {
-          return res
-            .status(404)
-            .json({ error: "Customer not found in database" });
+          return res.status(404).json({ error: "Customer not found in database" });
         }
       } catch (error) {
-        console.error("Error querying the database:", error);
         return res.status(500).json({ error: "Internal server error" });
       }
     }

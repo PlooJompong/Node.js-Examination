@@ -10,41 +10,19 @@ import checkProductExists from "../middleware/checkProductExists.js";
 
 const router = Router();
 
-// router.get("/cart", showCart);
+// Show cart
 router.get("/:id", showCart);
 
-router.post("/", checkProductExists, (req, res, next) => {
-  addToCart(req, res, next);
-});
+// Add item to cart
+router.post("/", checkProductExists, addToCart)
 
 // Place order
 router.post("/order", placeOrder);
 
 //Delete order
-router.delete("/", async (req, res) => {
-  try {
-    const deleteItem = await deleteOrder(req.body._id);
-    res.json({ message: "Item deleted successfully", item: deleteItem });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error deleting item", error: error.message });
-  }
-});
+router.delete("/", deleteOrder)
 
 //Delete item in order
-router.delete("/item", async (req, res) => {
-  try {
-    const deleteItem = await deleteItemInOrder(
-      req.body.cartID,
-      req.body.productID
-    );
-    res.json({ message: "Item deleted successfully", item: deleteItem });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error deleting item", error: error.message });
-  }
-});
+router.delete("/item", deleteItemInOrder)
 
 export default router;

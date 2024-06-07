@@ -1,22 +1,30 @@
 import db from '../database/database.js';
 
-//Search for all orders in orders database made by customer with selected customerId.
-//User story:  Som en inloggad användare vill jag kunna se min orderhistorik för att jag ska kunna få en överblick över när och vad jag beställt samt för hur mycket.
-
-const getOrdersByCustomerId = async (customerId) => {
+const getOrdersByCustomerId = async (req, res) => {
   try {
-    const orders = await db.orders.find({ customerID: customerId });
-    return orders;
+    const customerID = req.params.id
+    const orders = await db.orders.find({ customerID: customerID });
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.json({ orders })
   } catch (error) {
-    console.error("Error fetching orders", error);
     throw error;
   }
 }
 
-const getOrderByOrderId = async (orderId) => {
+const getOrderByOrderId = async (req, res) => {
   try {
+    const orderId = req.params.id
     const order = await db.orders.findOne({ _id: orderId });
-    return order;
+
+    if (!order || order.length === 0) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.json({ order })
   } catch (error) {
     console.error("Error fetching order", error);
     throw error;
