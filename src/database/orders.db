@@ -1,0 +1,5 @@
+{"customerID":"111","date":"2024-05-30 18:50","products":"kaffe","quantity":4,"pricePerUnit":35,"_id":11}
+{"customerID":"222","date":"2024-05-30 18:50","products":"kaffe","quantity":4,"pricePerUnit":35,"_id":2222}
+{"customerID":"111","date":"2024-05-30 18:50","products":"kaffe","quantity":4,"pricePerUnit":35,"_id":5555}
+{"customerID":"111","date":"2024-05-30 18:50","products":"kaffe","quantity":4,"pricePerUnit":35,"_id":11111}
+{"customerID":"DzbWOAIZTDQUyoQB","cartID":"Acwd7ENmZXDGozIg","cartProducts":[{"title":"Macchiato","desc":"En macchiato med en skvätt mjölk.","price":30,"_id":"dy1JqGCeAYWaJqri","quantity":10}],"price":300,"date":"2024-06-04 07:25:13","estimatedDelivery":"2024-06-04 07:45:13","_id":"eTfiO8KvvvdkA6Pe"}
