@@ -4,10 +4,10 @@ import { getAllProducts } from "../controller/menu.js";
 
 const router = Router();
 
-// GET menu
+// Get menu
 router.get("/menu", getAllProducts)
 
-// GET company info
+// Get company info
 router.get("/", getCompanyInfo)
 
 export default router;

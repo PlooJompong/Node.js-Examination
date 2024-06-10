@@ -7,6 +7,7 @@ import {
   showCart,
 } from "../controller/cart.js";
 import checkProductExists from "../middleware/checkProductExists.js";
+import authMiddleware from "../middleware/auth.js";
 
 const router = Router();
 
@@ -19,10 +20,10 @@ router.post("/", checkProductExists, addToCart)
 // Place order
 router.post("/order", placeOrder);
 
-//Delete order
-router.delete("/", deleteOrder)
+// Delete order
+router.delete("/", authMiddleware, deleteOrder)
 
-//Delete item in order
-router.delete("/item", deleteItemInOrder)
+// Delete item in order
+router.delete("/item", authMiddleware, deleteItemInOrder)
 
 export default router;

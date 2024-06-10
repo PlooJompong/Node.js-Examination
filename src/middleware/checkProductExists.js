@@ -26,7 +26,7 @@ const checkProductExists = async (req, res, next) => {
       });
       if (!cartQuery) {
         return res.status(404).json({
-          error: "Cart with customerID and cartID  not found in database",
+          error: "Cart with customerID and cartID not found in database",
         });
       }
     } catch (error) {
@@ -54,6 +54,7 @@ const checkProductExists = async (req, res, next) => {
       }
     }
   }
+
   next();
 }
 

@@ -11,7 +11,7 @@ const getOrdersByCustomerId = async (req, res) => {
 
     res.json({ orders })
   } catch (error) {
-    throw error;
+    throw new error;
   }
 }
 
@@ -26,8 +26,7 @@ const getOrderByOrderId = async (req, res) => {
 
     res.json({ order })
   } catch (error) {
-    console.error("Error fetching order", error);
-    throw error;
+    throw new error;
   }
 }
 

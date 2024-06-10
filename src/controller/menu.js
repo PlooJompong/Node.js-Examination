@@ -1,6 +1,6 @@
 import db from '../database/database.js';
 
-// Function for menu
+// Get menu
 const getAllProducts = async (req, res) => {
   try {
     const allProducts = await db.menu.find({});
