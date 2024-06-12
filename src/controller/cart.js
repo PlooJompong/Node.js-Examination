@@ -78,20 +78,25 @@ const addToCart = async (req, res) => {
 
 // Show cart
 const showCart = async (req, res) => {
-  const cartID = req.params.id;
   try {
+    const cartID = req.params.id;
     const cart = await db.cart.findOne({ _id: cartID });
-    let price = 0;
+
+    let totalPrice = 0;
+
     if (!cart) {
       return res
         .status(404)
         .json({ message: `Cart: ${cartID} could not be found` });
     }
+
     cart.product.forEach((product) => {
-      price = price + product.quantity * product.price;
+      totalPrice += product.quantity * product.price;
     });
-    const response = { ...cart, price };
-    res.send(response);
+
+    const showCart = { ...cart, totalPrice, };
+
+    res.send(showCart);
   } catch (error) {
     res
       .status(500)
@@ -101,13 +106,13 @@ const showCart = async (req, res) => {
 
 // Place order
 const placeOrder = async (req, res) => {
-  const { customerID, cartID, guestInfo } = req.body;
-  const orderTime = formatDate(new Date());
-
-  let orderCustomerID = customerID;
-  let price = 0;
-
   try {
+    const { customerID, cartID, guestInfo, discountID } = req.body;
+    const orderTime = formatDate(new Date());
+
+    let orderCustomerID = customerID;
+    let price = 0;
+
     if (!cartID) {
       return res.status(400).json({ message: "CartID is required" });
     }
@@ -154,29 +159,51 @@ const placeOrder = async (req, res) => {
     // Calculate estimated delivery time
     const estimatedDelivery = formatDate(new Date(Date.now() + 20 * 60 * 1000));
 
+    let discountPrice = null
+
+    // Check if discount code is valid
+    if (discountID) {
+      const discount = await db.discount.findOne({ _id: discountID });
+
+      if (!discount) {
+        return res.status(400).json({ message: "Invalid discount code" });
+      }
+
+      discountPrice = discount.discountPrice
+    }
+
     // Calculate total price
     allCartProducts.forEach((product) => {
       price += product.quantity * product.price;
     });
 
+    let totalPrice = price - discountPrice
+
+    if (discountPrice > price) {
+      totalPrice = 0
+    }
+
+
     const newOrder = {
       customerID: orderCustomerID,
       cartID: cartID,
       cartProducts: allCartProducts,
-      price: price,
-      date: orderTime,
+      orgPrice: price,
+      discount: discountPrice ? discountPrice : 0,
+      totalPrice: totalPrice,
+      orderAt: orderTime,
       estimatedDelivery: estimatedDelivery,
     };
 
     const savedOrder = await db["orders"].insert(newOrder);
-    await db["cart"].remove({ _id: cartID });
+    // await db.cart.remove({ _id: cartID });
+    // await db.discount.remove({ _id: discountID });
 
     res.json({ message: "Order placed successfully", order: savedOrder });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: error.message });
   }
-};
-
+}
 
 const deleteOrder = async (req, res) => {
   const { cartID } = req.body
@@ -190,7 +217,7 @@ const deleteOrder = async (req, res) => {
 
     res.json({ success: `successfully delete cart ${cartID}` });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -220,7 +247,7 @@ const deleteItemInOrder = async (req, res) => {
 
     res.json({ updatedCart: cartItem.product });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ error: error.message });
   }
 };
 

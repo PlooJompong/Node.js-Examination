@@ -1,3 +1,4 @@
+import { error } from "console";
 import db from "../database/database.js";
 import hashPassword from "../utils/hashPassword.js";
 
@@ -25,22 +26,22 @@ const userRegister = async (req, res) => {
 
 // Log in a user
 const userLogin = async (req, res) => {
-  const { username, password } = req.body;
-
   try {
+    const { username, password } = req.body;
     const hashedPassword = hashPassword(password);
     const user = await db.customers.findOne({ username: username, password: hashedPassword });
 
     if (user) {
       global.isAdmin = false
-      res.status(200).json({ message: "Login successful", user });
+      global.currentUser = user,
+        res.status(200).json({ message: "Login successful", user });
     }
     else {
       res.status(400).json({ error: "Invalid username or password" });
     }
 
   } catch {
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: error.message });
   }
 }
 

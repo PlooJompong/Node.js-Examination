@@ -5,6 +5,7 @@ import {
   getAllCustomers
 } from "../controller/admin/admin.js";
 import { addProduct, updateProduct, deleteProduct } from "../controller/admin/menuManagement.js";
+import { addDiscount } from "../controller/admin/discount.js";
 import { addProductSchema, updateProductSchema, deleteProductSchema, discountSchema, validateRequest } from "../middleware/admin/productSchema.js";
 import adminAuthMiddleware from "../middleware/admin/adminAuth.js";
 

@@ -1,10 +1,12 @@
+import { error } from "console";
 import db from "../../database/database.js";
 import hashPassword from "../../utils/hashPassword.js";
 
 // Admin registration
 const adminRegister = async (req, res) => {
-  const { username, password } = req.body;
   try {
+    const { username, password } = req.body;
+
     // Check if the username already exists
     const existingUsername = await db.admin.findOne({ username });
 
@@ -26,9 +28,8 @@ const adminRegister = async (req, res) => {
 
 // Admin Log in
 const adminLogin = async (req, res) => {
-  const { username, password } = req.body;
-
   try {
+    const { username, password } = req.body;
     const hashedPassword = hashPassword(password);
     const admin = await db.admin.findOne({ username: username, password: hashedPassword });
 
@@ -42,7 +43,7 @@ const adminLogin = async (req, res) => {
     }
 
   } catch {
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: error.message });
   }
 }
 
@@ -55,7 +56,7 @@ const getAllCustomers = async (req, res) => {
       res.status(404).json({ error: "No customers found" });
     }
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch customers" });
+    res.status(500).json({ error: error.message });
   }
 };
 

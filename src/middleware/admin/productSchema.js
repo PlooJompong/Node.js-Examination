@@ -22,8 +22,8 @@ const deleteProductSchema = Joi.object({
 
 const discountSchema = Joi.object({
   title: Joi.string().min(2).max(30).required(),
-  products: Joi.array().min(1).required(),
-  price: Joi.number().integer().required(),
+  productID: Joi.array().min(1).required(),
+  discountPrice: Joi.number().integer().required(),
 });
 
 // Validate product
