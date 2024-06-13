@@ -21,9 +21,8 @@ const addProduct = async (req, res) => {
     });
 
     res.status(201).json({ message: "Product added successfully", product: newProduct });
-
   } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -59,10 +58,8 @@ const updateProduct = async (req, res) => {
     const updatedProduct = await db.menu.findOne({ _id: productID });
 
     res.status(200).json({ message: "Product updated successfully", product: updatedProduct });
-  }
-
-  catch (error) {
-    res.status(500).json({ error: "Server error" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 }
 
@@ -79,9 +76,8 @@ const deleteProduct = async (req, res) => {
     await db.menu.remove({ _id: productID }, {});
 
     res.status(200).json({ message: "Product deleted successfully" });
-
   } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: error.message });
   }
 }
 

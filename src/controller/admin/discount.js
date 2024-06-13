@@ -1,5 +1,6 @@
 import db from "../../database/database.js";
 
+// Add new discount
 const addDiscount = async (req, res) => {
   try {
     const { title, productID, discountPrice } = req.body;
@@ -20,7 +21,7 @@ const addDiscount = async (req, res) => {
 
     res.status(200).json({ message: "Discount added successfully", discount });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: error.message })
   }
 }
 

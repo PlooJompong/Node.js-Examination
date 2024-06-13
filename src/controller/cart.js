@@ -12,12 +12,14 @@ const addToCart = async (req, res) => {
     ...coffeeQuery,
     quantity: quantity,
   };
+
   if (cartID) {
     const cartQuery = await db.cart.findOne({ _id: cartID });
     // Check if product is already added
     const productExists = cartQuery.product.some(
       (product) => product._id === productID
     );
+
     if (productExists) {
       // Find index of the existing product
       const productIndex = cartQuery.product.findIndex(
@@ -36,7 +38,7 @@ const addToCart = async (req, res) => {
               [`product.${productIndex}.quantity`]: newQuantity,
             },
           },
-          { returnUpdatedDocs: true } // This option will return the updated document
+          { returnUpdatedDocs: true }
         );
         const productInfo = { ...coffeeQuery };
         return res.status(200).json({ product: "Added", productInfo });
@@ -108,10 +110,14 @@ const showCart = async (req, res) => {
 const placeOrder = async (req, res) => {
   try {
     const { customerID, cartID, guestInfo, discountID } = req.body;
+
     const orderTime = formatDate(new Date());
+    const estimatedDelivery = formatDate(new Date(Date.now() + 20 * 60 * 1000));
 
     let orderCustomerID = customerID;
     let price = 0;
+    let discountPrice = 0;
+    let discountItems = [];
 
     if (!cartID) {
       return res.status(400).json({ message: "CartID is required" });
@@ -123,8 +129,6 @@ const placeOrder = async (req, res) => {
       return res.status(400).json({ message: "Invalid CartID" });
     }
 
-    const allCartProducts = cart.product;
-
     if (guestInfo && customerID) {
       return res.status(400).json({ message: "Cannot provide both CustomerID and GuestInfo" });
     }
@@ -135,7 +139,7 @@ const placeOrder = async (req, res) => {
         return res.status(400).json({ message: "Guest email and phone are required" });
       }
 
-      // Create a guest entry if not logged in
+      // Create a guest entry if not order as registered user
       const guestCustomer = await db.customers.insert({
         username: "guest",
         email: guestInfo.email,
@@ -146,6 +150,7 @@ const placeOrder = async (req, res) => {
 
     if (orderCustomerID && !guestInfo) {
       const customer = await db.customers.findOne({ _id: orderCustomerID });
+
       if (!customer) {
         return res.status(400).json({ message: "Customer not found" });
       }
@@ -156,11 +161,6 @@ const placeOrder = async (req, res) => {
       return res.status(400).json({ message: "CustomerID or valid GuestInfo is required" });
     }
 
-    // Calculate estimated delivery time
-    const estimatedDelivery = formatDate(new Date(Date.now() + 20 * 60 * 1000));
-
-    let discountPrice = null
-
     // Check if discount code is valid
     if (discountID) {
       const discount = await db.discount.findOne({ _id: discountID });
@@ -169,46 +169,54 @@ const placeOrder = async (req, res) => {
         return res.status(400).json({ message: "Invalid discount code" });
       }
 
-      discountPrice = discount.discountPrice
+      discountItems = discount.products;
+      discountPrice = discount.discountPrice;
+
+      // All product titles from cart
+      const productTitles = cart.product.map(product => product.title);
+
+      // Compare product titles with discount items
+      const allItemsInDiscount = discountItems.every(item => productTitles.includes(item));
+
+      if (!allItemsInDiscount) {
+        return res.status(400).json({ message: "Not all discount products are in the cart" });
+      }
     }
+
+    // All products from cart
+    const allCartProducts = cart.product;
 
     // Calculate total price
     allCartProducts.forEach((product) => {
       price += product.quantity * product.price;
     });
 
-    let totalPrice = price - discountPrice
-
-    if (discountPrice > price) {
-      totalPrice = 0
-    }
-
+    const totalPrice = Math.max(price - discountPrice, 0);
 
     const newOrder = {
       customerID: orderCustomerID,
       cartID: cartID,
       cartProducts: allCartProducts,
       orgPrice: price,
-      discount: discountPrice ? discountPrice : 0,
+      discount: discountPrice,
       totalPrice: totalPrice,
       orderAt: orderTime,
       estimatedDelivery: estimatedDelivery,
     };
 
-    const savedOrder = await db["orders"].insert(newOrder);
-    // await db.cart.remove({ _id: cartID });
-    // await db.discount.remove({ _id: discountID });
+    const savedOrder = await db.orders.insert(newOrder);
 
     res.json({ message: "Order placed successfully", order: savedOrder });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: error.message });
   }
 }
 
 const deleteOrder = async (req, res) => {
-  const { cartID } = req.body
   try {
+    const { cartID } = req.body
     const cartItem = await db.cart.findOne({ _id: cartID });
+
     if (!cartItem) {
       return res.status(400).json({ message: "Cart not found" });
     }
@@ -221,12 +229,16 @@ const deleteOrder = async (req, res) => {
   }
 };
 
-
 const deleteItemInOrder = async (req, res) => {
-  const { cartID, productID } = req.body;
-
   try {
+    const { cartID, productID } = req.body;
+
+    if (!cartID || !productID) {
+      return res.status(400).json({ message: "CartID and productID are required" });
+    }
+
     const cartItem = await db.cart.findOne({ _id: cartID });
+
     if (!cartItem) {
       return res.status(400).json({ message: "Cart not found" });
     }
@@ -237,7 +249,6 @@ const deleteItemInOrder = async (req, res) => {
       return res.status(400).json({ message: "Product not found in cart" });
     }
 
-    // Remove product from cart
     cartItem.product.splice(productIndex, 1);
 
     await db.cart.update(
@@ -245,7 +256,7 @@ const deleteItemInOrder = async (req, res) => {
       { $set: { product: cartItem.product } }
     );
 
-    res.json({ updatedCart: cartItem.product });
+    res.json({ message: "Product removed from cart", updatedCart: cartItem.product });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

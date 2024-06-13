@@ -58,4 +58,4 @@ const checkProductExists = async (req, res, next) => {
   next();
 }
 
-export default checkProductExists;
+export default checkProductExists

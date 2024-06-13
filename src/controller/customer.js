@@ -1,4 +1,3 @@
-import { error } from "console";
 import db from "../database/database.js";
 import hashPassword from "../utils/hashPassword.js";
 
@@ -6,7 +5,6 @@ import hashPassword from "../utils/hashPassword.js";
 const userRegister = async (req, res) => {
   const { username, password } = req.body;
   try {
-    // Check if the username already exists
     const existingUsername = await db.customers.findOne({ username });
 
     if (existingUsername) {
@@ -18,6 +16,7 @@ const userRegister = async (req, res) => {
       username,
       password: hashPassword(password),
     });
+
     res.status(201).json({ message: "User registered successfully", user: newUser });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -35,11 +34,9 @@ const userLogin = async (req, res) => {
       global.isAdmin = false
       global.currentUser = user,
         res.status(200).json({ message: "Login successful", user });
-    }
-    else {
+    } else {
       res.status(400).json({ error: "Invalid username or password" });
     }
-
   } catch {
     res.status(500).json({ error: error.message });
   }

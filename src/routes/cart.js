@@ -6,7 +6,7 @@ import {
   placeOrder,
   showCart,
 } from "../controller/cart.js";
-import checkProductExists from "../middleware/checkProductExists.js";
+import checkProductExistsMiddleware from "../middleware/checkProductExists.js";
 import authMiddleware from "../middleware/auth.js";
 
 const router = Router();
@@ -15,7 +15,7 @@ const router = Router();
 router.get("/:id", showCart);
 
 // Add item to cart
-router.post("/", checkProductExists, addToCart)
+router.post("/", checkProductExistsMiddleware, addToCart)
 
 // Place order
 router.post("/order", placeOrder);

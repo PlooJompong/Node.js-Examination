@@ -1,4 +1,4 @@
-const isAdmin = (req, res, next) => {
+const adminAuth = (req, res, next) => {
   if (global.isAdmin) {
     return next();
   }
@@ -6,4 +6,4 @@ const isAdmin = (req, res, next) => {
   res.status(401).json({ error: "Access denied, please login as admin" });
 };
 
-export default isAdmin
+export { adminAuth as adminAuthMiddleware }

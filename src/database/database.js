@@ -10,6 +10,7 @@ const db = {};
 
 database_names.forEach((name) => {
   const filename = path.join(__dirname, `${name}.db`);
+
   db[name] = new nedb({
     filename: filename,
     autoload: true,
@@ -17,4 +18,3 @@ database_names.forEach((name) => {
 });
 
 export default db;
-
