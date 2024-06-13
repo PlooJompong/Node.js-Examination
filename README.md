@@ -1,96 +1,130 @@
-# Airbean-API - Grupp 2
+# Airbean-API
 
-## 1.
+---
 
-`Som användare vill jag kunna se alla kaffesorter som går att beställa så jag får en överblick vad jag kan beställa och välja mellan.`
+## Project Description
 
-#### GET - /info/menu
+Exam assignment for the Backend with NodeJs course. The task consists of two parts:
 
-###### Response
+### Group Work Part 1
 
-```
-[
-    {
-        "title": "Cortado",
-        "desc": "En cortado med lika delar espresso och varm mjölk.",
-        "price": 33,
-        "_id": "0Gu3mPAbONk1hy4P"
-    },
-    {
-        "title": "Flat White",
-        "desc": "En platt vit med silkeslen mikroskum och stark espresso.",
-        "price": 46,
-        "_id": "3IBqddqDtbAtIi2E"
-    },
-    [...]
-```
+The first part is done in a group. The task is to create an API for the Airbean web app where users can order coffee. The following functionalities are included:
 
-## 2.
+- Create a customer account
+- Log in as a customer
+- View company information
+- View all products available in the menu
+- Add products from the menu to a shopping cart
+- View the contents of the shopping cart
+- Remove a product from the shopping cart
+- Remove shopping cart
+- Place an order as registered customer
+- Place an order as guest
+- View previous orders
 
-`Som användare vill jag kunna lägga en kaffesort i en varukorg så jag kan beställa mer samt få en överblick vad jag lagt till.`
+### Individual Work Part 2
 
-#### POST - /cart
+In the individual part of the Airbean API, the `admin` should be able to do the following:
 
-###### Request
+- Create an admin account
+- Log in as admin
+- View all customers in the database
+- Remove products from the menu
+- Modify existing menu items
+- Create offers
 
-```
-{
-  "product": "6ymMjHWMpLGChmJ6", // Mandatory, productID. Checks menu.db if the product exist.
-  "cartID": "", // Optional, new cart if empty, existing cart if it exists.
-  "customerID": "", // Optional, guest if empty.
-  "quantity": 1 // Optional, gets 1 if empty.
-}
-```
+---
 
-###### Response
+## Installation
 
-```
-{
-    "customerID": "",
-    "product": [
-        {
-            "title": "Mocha",
-            "desc": "En söt mocha med choklad och espresso.",
-            "price": 55,
-            "_id": "6ymMjHWMpLGChmJ6",
-            "quantity": 1
-        }
-    ],
-    "_id": "yHYB6NvAuAXa3CW2",
-    "instructions": "cartID would've been saved to session/cookie to be included in the next call"
-}
-```
+To get started, make sure you have [Node.js](https://nodejs.org/en/) installed on your computer. You can check if Node.js is installed by running `node -v` in your terminal.
 
-### 3.
+1. Clone this repository to your local machine.
+2. Navigate to the repository in your terminal.
+3. Install dependencies by running `npm install` in the terminal.
+4. Start the server by running `npm run dev` in the terminal.
 
-`Som användare vill jag kunna ta bort en kaffesort i min varukorg så jag kan ändra mig ifall jag la till något av misstag eller inte längre vill ha det jag la till.`
+Base URL: `http://localhost:8000` or `https://localhost:{PORT}` if PORT is defined in your `.env`.
 
-#### DELETE - /cart/item
+Make API calls using your preferred application (Postman, Insomnia, etc.).
+
+---
+
+### Customer Part 1
+
+#### Create customer account
+
+##### POST - /customer/register
 
 ###### Request
 
 ```
+    {
+        "username": "ploo",
+        "password": "password",
+    }
+```
+
+###### Response
+
+```
 {
-  "cartID": "vVu2PrXxomKcrtQt",
-  "productID" : "SjwGh9EVaYWtIzs7"
+    "message": "User registered successfully",
+    "user": {
+        "username": "ploo",
+        "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+        "_id": "g8svUcLCUjXoYq8p"
+    }
 }
 ```
 
-##### Response
+###### Error
+
+```
+    { "error": "Username already in use" }
+```
+
+---
+
+#### Login as registered customer
+
+##### POST - /customer/login
+
+###### Request
+
+```
+    {
+        "username": "ploo",
+        "password": "password",
+    }
+```
+
+###### Response
 
 ```
 {
-    "message": "Item deleted successfully"
+    "message": "Login successfully",
+    "user": {
+        "username": "ploo",
+        "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+        "_id": "g8svUcLCUjXoYq8p"
+    }
 }
 ```
 
-## 4.
+###### Error
 
-`Som användare vill jag kunna läsa mer om företaget och dess kaffe så jag för förståelse för hur det produceras och kan göra ett informerat val.`
+```
+    { "error": "Invalid username or password" }
+```
 
-#### GET - /info
+---
 
-##### Response
+#### View company information
+
+##### GET - /info
+
+###### Response
 
 ```
 {
@@ -98,226 +132,15 @@
 }
 ```
 
-## 5.
-
-`Som användare vill jag se min varukorg så jag får en överblick vad jag beställt och den totala summan att betala.`
-
-#### GET - /cart/:id
-
-###### Response
+---
 
 ```
-{
-    "customerID": "ehLEGwSC1FzobAHN",
-    "product": [
-        {
-            "title": "Macchiato",
-            "desc": "En macchiato med en skvätt mjölk.",
-            "price": 30,
-            "_id": "dy1JqGCeAYWaJqri",
-            "quantity": 10
-        },
-        {
-            "title": "Cappuccino",
-            "desc": "En krämig cappuccino med skummad mjölk.",
-            "price": 45,
-            "_id": "nG7UZ7wTTM0wm64Q",
-            "quantity": 4
-        }
-    ],
-    "_id": "Acwd7ENmZXDGozIg",
-    "price": 480
-}
-```
-
-## 6.
-
-`Som användare vill jag kunna lägga en beställning som antingen gäst eller inloggad användare och se när beställningen levereras så att jag får mitt kaffe och vet ungefär när det kommer.`
-
-#### POST - /cart/order
-
-##### Request
-
-###### Guest
-
-```
-{
-  "customerID": null,
-  "cartID": "Acwd7ENmZXDGozIg",
-  "guestInfo": {
-    "email": "guest@example.com",
-    "phone": "1234567890"
-  }
-}
-```
-
-###### User
-
-```
-{
-  "customerID": "DzbWOAIZTDQUyoQB",
-  "cartID": "Acwd7ENmZXDGozIg",
-  "guestInfo": "null"
-}
-```
-
-##### Response
-
-```
-{
-    "message": "Order placed successfully",
-    "order": {
-        "customerID": "3CFuQELPvlVoLZfz",
-        "cartID": "Acwd7ENmZXDGozIg",
-        "cartProducts": [
-            {
-                "title": "Macchiato",
-                "desc": "En macchiato med en skvätt mjölk.",
-                "price": 30,
-                "_id": "dy1JqGCeAYWaJqri",
-                "quantity": 10
-            },
-            {
-                "title": "Cappuccino",
-                "desc": "En krämig cappuccino med skummad mjölk.",
-                "price": 45,
-                "_id": "nG7UZ7wTTM0wm64Q",
-                "quantity": 4
-            }
-        ],
-        "price": 480,
-        "date": "2024-06-03 15:07:17",
-        "estimatedDelivery": "2024-06-03 15:27:17",
-        "_id": "si1ip4tQsAh8K3OL"
-    }
-}
-```
-
-## 7.
-
-`Som användare vill jag att det ska finnas en navigering så jag kan enkelt navigera mellan de olika sidorna och hitta det jag söker.`
-
-Routes?
-
-## 8.
-
-`Som användare vill jag kunna skapa ett konto för att kunna spara mina ordrar på mitt konto så jag kan se min orderhistorik.`
-
-#### POST - /customer/register
-
-##### Request
-
-```
-{
-    "username": "andreas",
-    "password": "password",
-    "email": "a@b.se",
-    "phone": "0731234567"
-}
-```
-
-##### Response
-
-```
-{
-    "message": "User registered successfully",
-    "user": {
-        "username": "andreas",
-        "email": "a@b.se",
-        "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
-        "phone": "0731234567",
-        "_id": "COwTqeN5KqmJB5wB"
-    }
-}
-```
-
-## 9.
-
-`Som användare vill jag kunna logga in för att sedan kunna lägga mina ordrar som inloggad användare så dessa sparas till min orderhistorik.`
-
-#### POST - /customer/login
-
-##### Request
-
-```
-{
-    "email": "a@b.se",
-    "password": "andreas"
-}
-```
-
-##### Response
-
-```
-{
-    "message": "User registered successfully",
-    "user": {
-        "username": "andreas",
-        "email": "a@b.se",
-        "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
-        "phone": "0731234567",
-        "_id": "COwTqeN5KqmJB5wB"
-    }
-}
-```
-
-#### GET - /orders/:id   
-
-##### Response
-
-```
-{
-    "order": [
-        {
-            "customerID": "COwTqeN5KqmJB5wB",
-            "date": "2024-05-30 18:50",
-            "products": "kaffe",
-            "quantity": 4,
-            "pricePerUnit": 35,
-            "_id": 11
-        },
-        {
-            "customerID": "COwTqeN5KqmJB5wB",
-            "date": "2024-05-30 18:50",
-            "products": "kaffe",
-            "quantity": 4,
-            "pricePerUnit": 35,
-            "_id": 5555
-        },
-        {
-            "customerID": "COwTqeN5KqmJB5wB",
-            "date": "2024-05-30 18:50",
-            "products": "kaffe",
-            "quantity": 4,
-            "pricePerUnit": 35,
-            "_id": 11111
-        }
-    ]
-}
-```
-
-## 10.
-
-#### GET - /orders/confirmation/:id    (order-id)
-
-##### Response
-
-```
-{
-    "customerID": "kFgt740aCqbHJLbC",
-    "cartID": "x3gCLt7e1PLXBelE",
-    "cartProducts": [
-        {
-            "title": "Americano",
-            "desc": "En espresso utspädd med varmt vatten.",
-            "price": 35,
-            "_id": "SjwGh9EVaYWtIzs7",
-            "quantity": 2
-        }
-    ],
-    "date": "2024-06-03 14:28:01",
-    "estimatedDelivery": "2024-06-03 14:48:01",
-    "_id": "G3sS0UTlMmYN5arH",
-    "deliveryTime": "14:48"
-}
+- View all products available in the menu
+- Add products from the menu to a shopping cart
+- View the contents of the shopping cart
+- Remove a product from the shopping cart
+- Remove shopping cart
+- Place an order as registered customer
+- Place an order as guest
+- View previous orders
 ```
