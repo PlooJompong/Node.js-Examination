@@ -6,7 +6,8 @@ const addProduct = async (req, res) => {
   try {
     const { title, desc, price } = req.body;
 
-    const existingProduct = await db.menu.findOne({ title });
+    // Case-insensitive check for an existing product title
+    const existingProduct = await db.menu.findOne({ title: { $regex: new RegExp('^' + title + '$', 'i') } });
 
     if (existingProduct) {
       return res.status(409).json({ message: "Product with this title already exists" });
@@ -40,6 +41,15 @@ const updateProduct = async (req, res) => {
     const newTitle = title ? title : existingProduct.title;
     const newDesc = desc ? desc : existingProduct.desc;
     const newPrice = price ? price : existingProduct.price;
+
+    // Check if title already exists
+    if (newTitle !== existingProduct.title) {
+      const titleExists = await db.menu.findOne({ title: { $regex: new RegExp('^' + newTitle + '$', 'i') } });
+
+      if (titleExists) {
+        return res.status(409).json({ message: "Product with this title already exists" });
+      }
+    }
 
     const updateData = {
       title: newTitle,

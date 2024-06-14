@@ -1,7 +1,5 @@
 # Airbean-API
 
----
-
 ## Project Description
 
 Exam assignment for the Backend with NodeJs course. The task consists of two parts:
@@ -21,6 +19,7 @@ The first part is done in a group. The task is to create an API for the Airbean 
 - Place an order as registered customer
 - Place an order as guest
 - View previous orders
+- View order details
 
 ### Individual Work Part 2
 
@@ -32,8 +31,6 @@ In the individual part of the Airbean API, the `admin` should be able to do the 
 - Remove products from the menu
 - Modify existing menu items
 - Create offers
-
----
 
 ## Installation
 
@@ -48,8 +45,6 @@ Base URL: `http://localhost:8000` or `https://localhost:{PORT}` if PORT is defin
 
 Make API calls using your preferred application (Postman, Insomnia, etc.).
 
----
-
 ### Customer Part 1
 
 #### Create customer account
@@ -61,7 +56,7 @@ Make API calls using your preferred application (Postman, Insomnia, etc.).
 ```
     {
         "username": "ploo",
-        "password": "password",
+        "password": "password"
     }
 ```
 
@@ -78,14 +73,6 @@ Make API calls using your preferred application (Postman, Insomnia, etc.).
 }
 ```
 
-###### Error
-
-```
-    { "error": "Username already in use" }
-```
-
----
-
 #### Login as registered customer
 
 ##### POST - /customer/login
@@ -93,10 +80,10 @@ Make API calls using your preferred application (Postman, Insomnia, etc.).
 ###### Request
 
 ```
-    {
-        "username": "ploo",
-        "password": "password",
-    }
+{
+    "username": "ploo", // required
+    "password": "password" // required
+}
 ```
 
 ###### Response
@@ -112,14 +99,6 @@ Make API calls using your preferred application (Postman, Insomnia, etc.).
 }
 ```
 
-###### Error
-
-```
-    { "error": "Invalid username or password" }
-```
-
----
-
 #### View company information
 
 ##### GET - /info
@@ -132,15 +111,402 @@ Make API calls using your preferred application (Postman, Insomnia, etc.).
 }
 ```
 
----
+#### View all products available in the menu
+
+##### GET - /info/menu
+
+###### Response
 
 ```
-- View all products available in the menu
-- Add products from the menu to a shopping cart
-- View the contents of the shopping cart
-- Remove a product from the shopping cart
-- Remove shopping cart
-- Place an order as registered customer
-- Place an order as guest
-- View previous orders
+[
+    {
+        "title": "Cortado",
+        "desc": "En cortado med lika delar espresso och varm mjölk.",
+        "price": 33,
+        "createAt": "2024-06-1 14:21:10",
+        "modifiedAt": "",
+        "_id": "0Gu3mPAbONk1hy4P"
+    },
+    {
+        "title": "Flat White",
+        "desc": "En platt vit med silkeslen mikroskum och stark espresso.",
+        "price": 46,
+        "createAt": "2024-06-1 14:21:10",
+        "modifiedAt": "",
+        "_id": "3IBqddqDtbAtIi2E"
+    },
+    [...]
+]
+```
+
+#### Add products from the menu to a shopping cart
+
+##### POST - /cart
+
+###### Request
+
+```
+{
+    "product": "0Gu3mPAbONk1hy4P", // required
+    "cartID": "", // optinal, if not provided a new cart will be created
+    "customerID": "", // optional, if not provided a new customer will be created
+    "quantity": 1 // optional, 1 if not provided. Must be intenger
+}
+```
+
+###### Response
+
+```
+{
+    "customerID": "",
+    "product": [
+        {
+            "title": "Cortado",
+            "desc": "En cortado med lika delar espresso och varm mjölk.",
+            "price": 33,
+            "createAt": "2024-06-1 14:21:10",
+            "modifiedAt": "",
+            "_id": "0Gu3mPAbONk1hy4P",
+            "quantity": 1
+        }
+    ],
+    "_id": "xTckju7ymnaDn3J6",
+    "instructions": "cartID would've been saved to session/cookie to be included in the next call"
+}
+```
+
+#### View the contents of the shopping cart
+
+##### GET - /cart/:cartID
+
+###### Response
+
+```
+{
+    "customerID": "g8svUcLCUjXoYq8p",
+    "product": [
+        {
+            "title": "Mocha",
+            "desc": "En söt mocha med choklad och espresso.",
+            "price": 50,
+            "createAt": "2024-06-1 14:21:10",
+            "modifiedAt": "",
+            "_id": "6ymMjHWMpLGChmJ6",
+            "quantity": 1
+        },
+        {
+            "title": "Flat White",
+            "desc": "En platt vit med silkeslen mikroskum och stark espresso.",
+            "price": 46,
+            "createAt": "2024-06-1 14:21:10",
+            "modifiedAt": "",
+            "_id": "3IBqddqDtbAtIi2E",
+            "quantity": 2
+        },
+        {
+            "title": "Cortado",
+            "desc": "En cortado med lika delar espresso och varm mjölk.",
+            "price": 33,
+            "createAt": "2024-06-1 14:21:10",
+            "modifiedAt": "",
+            "_id": "0Gu3mPAbONk1hy4P",
+            "quantity": 3
+        }
+    ],
+    "_id": "rVqdc2XBTSpbPrRW",
+    "totalPrice": 241
+}
+```
+
+#### Remove a product from the shopping cart
+
+- Must be logged in as customer to remove item from cart
+
+##### DELETE - /cart/item
+
+###### Request
+
+```
+{
+    "cartID": "rVqdc2XBTSpbPrRW", // required
+    "productID" : "0Gu3mPAbONk1hy4P" // required
+}
+```
+
+###### Response
+
+```
+{
+    "message": "Product rVqdc2XBTSpbPrRW removed from cart",
+    "updatedCart": [
+        {
+            "title": "Mocha",
+            "desc": "En söt mocha med choklad och espresso.",
+            "price": 50,
+            "createAt": "2024-06-1 14:21:10",
+            "modifiedAt": "",
+            "_id": "6ymMjHWMpLGChmJ6",
+            "quantity": 1
+        },
+        {
+            "title": "Flat White",
+            "desc": "En platt vit med silkeslen mikroskum och stark espresso.",
+            "price": 46,
+            "createAt": "2024-06-1 14:21:10",
+            "modifiedAt": "",
+            "_id": "3IBqddqDtbAtIi2E",
+            "quantity": 2
+        }
+    ]
+}
+```
+
+#### Remove shopping cart
+
+- Must be logged in as customer to remove the cart
+
+##### DELETE - /cart/
+
+###### Request
+
+```
+{
+    "cartID": "ZH3zJ2P7ofbVRKyl" // required
+}
+```
+
+###### Response
+
+```
+{
+    "message": "Product rVqdc2XBTSpbPrRW removed from cart",
+    "updatedCart": [
+        {
+            "title": "Mocha",
+            "desc": "En söt mocha med choklad och espresso.",
+            "price": 50,
+            "createAt": "2024-06-1 14:21:10",
+            "modifiedAt": "",
+            "_id": "6ymMjHWMpLGChmJ6",
+            "quantity": 1
+        },
+        {
+            "title": "Flat White",
+            "desc": "En platt vit med silkeslen mikroskum och stark espresso.",
+            "price": 46,
+            "createAt": "2024-06-1 14:21:10",
+            "modifiedAt": "",
+            "_id": "3IBqddqDtbAtIi2E",
+            "quantity": 2
+        }
+    ]
+}
+```
+
+#### Place an order as registered customer
+
+##### POST - /cart/order
+
+###### Request
+
+```
+{
+    "customerID": "g8svUcLCUjXoYq8p", // required
+    "cartID": "rVqdc2XBTSpbPrRW", // required
+    "discountID": "" // optional
+}
+```
+
+###### Response
+
+```
+{
+    "message": "Order placed successfully",
+    "order": {
+        "customerID": "g8svUcLCUjXoYq8p",
+        "cartID": "rVqdc2XBTSpbPrRW",
+        "cartProducts": [
+            {
+                "title": "Mocha",
+                "desc": "En söt mocha med choklad och espresso.",
+                "price": 50,
+                "createAt": "2024-06-1 14:21:10",
+                "modifiedAt": "",
+                "_id": "6ymMjHWMpLGChmJ6",
+                "quantity": 1
+            },
+            {
+                "title": "Flat White",
+                "desc": "En platt vit med silkeslen mikroskum och stark espresso.",
+                "price": 46,
+                "createAt": "2024-06-1 14:21:10",
+                "modifiedAt": "",
+                "_id": "3IBqddqDtbAtIi2E",
+                "quantity": 2
+            }
+        ],
+        "orgPrice": 142,
+        "discount": 0,
+        "totalPrice": 142,
+        "orderAt": "2024-06-14 13:16:42",
+        "estimatedDelivery": "2024-06-14 13:36:42",
+        "_id": "Zl6GhEUAklSQyKvV"
+    }
+}
+```
+
+#### Place an order as guest
+
+##### POST - /cart/order
+
+###### Request
+
+```
+{
+    "cartID": "ZH3zJ2P7ofbVRKyl", // required
+    "guestInfo": {
+        "email": "guest@example.com", // required
+        "phone": "0701234567" // required
+    }
+}
+```
+
+###### Response
+
+```
+{
+    "message": "Order placed successfully",
+    "order": {
+        "customerID": "6XmXJPAOsw6Szah8",
+        "cartID": "ZH3zJ2P7ofbVRKyl",
+        "cartProducts": [
+            {
+                "title": "Cortado",
+                "desc": "En cortado med lika delar espresso och varm mjölk.",
+                "price": 33,
+                "createAt": "2024-06-1 14:21:10",
+                "modifiedAt": "",
+                "_id": "0Gu3mPAbONk1hy4P",
+                "quantity": 1
+            },
+        ],
+        "orgPrice": 33,
+        "discount": 0,
+        "totalPrice": 33,
+        "orderAt": "2024-06-14 13:22:11",
+        "estimatedDelivery": "2024-06-14 13:42:11",
+        "_id": "A52Oj7rVTFlb8jV9"
+    }
+}
+```
+
+#### View previous orders
+
+- Must be logged in as customer to view previous orders
+
+##### GET - /orders/:customerID
+
+###### Response
+
+```
+{
+    "orders": [
+        {
+            "customerID": "6XmXJPAOsw6Szah8",
+            "cartID": "ZH3zJ2P7ofbVRKyl",
+            "cartProducts": [
+                {
+                    "title": "Cortado",
+                    "desc": "En cortado med lika delar espresso och varm mjölk.",
+                    "price": 33,
+                    "createAt": "2024-06-1 14:21:10",
+                    "modifiedAt": "",
+                    "_id": "0Gu3mPAbONk1hy4P",
+                    "quantity": 1
+                }
+            ],
+            "orgPrice": 33,
+            "discount": 0,
+            "totalPrice": 33,
+            "orderAt": "2024-06-14 13:22:11",
+            "estimatedDelivery": "2024-06-14 13:42:11",
+            "_id": "A52Oj7rVTFlb8jV9"
+        },
+        {
+            "customerID": "6XmXJPAOsw6Szah8",
+            "cartID": "rVqdc2XBTSpbPrRW",
+            "cartProducts": [
+                {
+                    "title": "Mocha",
+                    "desc": "En söt mocha med choklad och espresso.",
+                    "price": 50,
+                    "createAt": "2024-06-1 14:21:10",
+                    "modifiedAt": "",
+                    "_id": "6ymMjHWMpLGChmJ6",
+                    "quantity": 1
+                },
+                {
+                    "title": "Flat White",
+                    "desc": "En platt vit med silkeslen mikroskum och stark espresso.",
+                    "price": 46,
+                    "createAt": "2024-06-1 14:21:10",
+                    "modifiedAt": "",
+                    "_id": "3IBqddqDtbAtIi2E",
+                    "quantity": 2
+                }
+            ],
+            "orgPrice": 142,
+            "discount": 0,
+            "totalPrice": 142,
+            "orderAt": "2024-06-14 13:29:15",
+            "estimatedDelivery": "2024-06-14 13:49:15",
+            "_id": "xII2b4kcNxp3KenY"
+        }
+    ]
+}
+```
+
+#### View order details
+
+- Must be logged in as customer to view previous orders
+
+##### GET - /orders/:orderID
+
+###### Response
+
+```
+{
+    "order": [
+        {
+            "customerID": "6XmXJPAOsw6Szah8",
+            "cartID": "rVqdc2XBTSpbPrRW",
+            "cartProducts": [
+                {
+                    "title": "Mocha",
+                    "desc": "En söt mocha med choklad och espresso.",
+                    "price": 50,
+                    "createAt": "2024-06-1 14:21:10",
+                    "modifiedAt": "",
+                    "_id": "6ymMjHWMpLGChmJ6",
+                    "quantity": 1
+                },
+                {
+                    "title": "Flat White",
+                    "desc": "En platt vit med silkeslen mikroskum och stark espresso.",
+                    "price": 46,
+                    "createAt": "2024-06-1 14:21:10",
+                    "modifiedAt": "",
+                    "_id": "3IBqddqDtbAtIi2E",
+                    "quantity": 2
+                }
+            ],
+            "orgPrice": 142,
+            "discount": 0,
+            "totalPrice": 142,
+            "orderAt": "2024-06-14 13:29:15",
+            "estimatedDelivery": "2024-06-14 13:49:15",
+            "_id": "xII2b4kcNxp3KenY"
+        }
+    ]
+}
 ```

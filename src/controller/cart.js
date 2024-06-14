@@ -10,7 +10,7 @@ const addToCart = async (req, res) => {
 
   const queryWithQuantity = {
     ...coffeeQuery,
-    quantity: quantity,
+    quantity: (quantity),
   };
 
   if (cartID) {
@@ -223,7 +223,7 @@ const deleteOrder = async (req, res) => {
 
     await db.cart.remove({ _id: cartID }, {});
 
-    res.json({ success: `successfully delete cart ${cartID}` });
+    res.json({ message: `successfully delete cart ${cartID}` });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -256,7 +256,7 @@ const deleteItemInOrder = async (req, res) => {
       { $set: { product: cartItem.product } }
     );
 
-    res.json({ message: "Product removed from cart", updatedCart: cartItem.product });
+    res.json({ message: `Product ${cartID} removed from the cart`, updatedCart: cartItem.product });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

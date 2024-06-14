@@ -3,8 +3,8 @@ import hashPassword from "../utils/hashPassword.js";
 
 // Register a new user
 const userRegister = async (req, res) => {
-  const { username, password } = req.body;
   try {
+    const { username, password } = req.body;
     const existingUsername = await db.customers.findOne({ username });
 
     if (existingUsername) {
