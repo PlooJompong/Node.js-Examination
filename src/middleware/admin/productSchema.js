@@ -4,7 +4,7 @@ import Joi from "joi"
 const addProductSchema = Joi.object({
   title: Joi.string().min(2).max(30).required(),
   desc: Joi.string().min(5).max(50).required(),
-  price: Joi.number().integer().required(),
+  price: Joi.number().required(),
 });
 
 // Update product
@@ -20,10 +20,11 @@ const deleteProductSchema = Joi.object({
   productID: Joi.string().alphanum().length(16).required(),
 })
 
+// Create discount
 const discountSchema = Joi.object({
   title: Joi.string().min(2).max(30).required(),
   productID: Joi.array().min(1).required(),
-  discountPrice: Joi.number().integer().required(),
+  discountPrice: Joi.number().required(),
 });
 
 // Validate product

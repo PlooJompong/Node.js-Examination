@@ -206,6 +206,9 @@ const placeOrder = async (req, res) => {
 
     const savedOrder = await db.orders.insert(newOrder);
 
+    await db.cart.remove({ _id: cartID });
+    await db.discount.remove({ _id: discountID });
+
     res.json({ message: "Order placed successfully", order: savedOrder });
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -28,9 +28,10 @@ In the individual part of the Airbean API, the `admin` should be able to do the 
 - Create an admin account
 - Log in as admin
 - View all customers in the database
-- Remove products from the menu
+- Add new items to the menu
 - Modify existing menu items
-- Create offers
+- Remove products from the menu
+- Create discounts
 
 ## Installation
 
@@ -150,7 +151,7 @@ Make API calls using your preferred application (Postman, Insomnia, etc.).
     "product": "0Gu3mPAbONk1hy4P", // required
     "cartID": "", // optinal, if not provided a new cart will be created
     "customerID": "", // optional, if not provided a new customer will be created
-    "quantity": 1 // optional, 1 if not provided. Must be intenger
+    "quantity": 1 // optional, 1 if not provided. Must be a number
 }
 ```
 
@@ -265,7 +266,7 @@ Make API calls using your preferred application (Postman, Insomnia, etc.).
 
 - Must be logged in as customer to remove the cart
 
-##### DELETE - /cart/
+##### DELETE - /cart
 
 ###### Request
 
@@ -279,27 +280,7 @@ Make API calls using your preferred application (Postman, Insomnia, etc.).
 
 ```
 {
-    "message": "Product rVqdc2XBTSpbPrRW removed from cart",
-    "updatedCart": [
-        {
-            "title": "Mocha",
-            "desc": "En söt mocha med choklad och espresso.",
-            "price": 50,
-            "createAt": "2024-06-1 14:21:10",
-            "modifiedAt": "",
-            "_id": "6ymMjHWMpLGChmJ6",
-            "quantity": 1
-        },
-        {
-            "title": "Flat White",
-            "desc": "En platt vit med silkeslen mikroskum och stark espresso.",
-            "price": 46,
-            "createAt": "2024-06-1 14:21:10",
-            "modifiedAt": "",
-            "_id": "3IBqddqDtbAtIi2E",
-            "quantity": 2
-        }
-    ]
+    "message": "successfully delete cart ZH3zJ2P7ofbVRKyl"
 }
 ```
 
@@ -508,5 +489,195 @@ Make API calls using your preferred application (Postman, Insomnia, etc.).
             "_id": "xII2b4kcNxp3KenY"
         }
     ]
+}
+```
+
+### Admin Part 2
+
+- Must be logged in as admin to gain access to admin endpoints exept for login
+
+#### Login as admin
+
+#### POST - /admin/login
+
+###### Request
+
+```
+{
+    "username": "admin", // required
+    "password": "password" // required
+}
+```
+
+###### Response
+
+```
+{
+    "message": "Login successful",
+    "admin": {
+        "username": "admin",
+        "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+        "_id": "w83uEzMBJbCoZeD6"
+    }
+}
+```
+
+#### Create an admin account
+
+##### POST - /admin/register
+
+###### Request
+
+```
+{
+    usrname": "newAdmin", // required
+    "password": "password" // required
+}
+
+```
+
+###### Response
+
+```
+{
+    "message": "Admin registered successfully",
+    "admin": {
+        "username": "newAdmin",
+        "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+        "_id": "dgzgFVfLRgYIxahT"
+    }
+}
+```
+
+#### View all customers in the database
+
+##### GET - /admin/customers
+
+###### Response
+
+```
+[
+    {
+        "username": "guest",
+        "email": "guest@example.com",
+        "phone": "0701234567",
+        "_id": "6XmXJPAOsw6Szah8"
+    },
+    {
+        "username": "ploo",
+        "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+        "_id": "g8svUcLCUjXoYq8p"
+    }
+]
+```
+
+#### Add new items to the menu
+
+##### POST - /admin/products
+
+###### Request
+
+```
+{
+    "title": "Grönt Te", // required, must be between 2 and 30 characters
+    "desc": "Grönt te", // required, must be between 5 and 50 characters
+    "price": 29 // required, must be a number
+}
+```
+
+###### Response
+
+```
+{
+    "message": "Product added successfully",
+    "product": {
+        "title": "Grönt Te",
+        "desc": "Grönt te",
+        "price": 29,
+        "createAt": "2024-06-14 15:08:28",
+        "modifiedAt": "",
+        "_id": "jgNTTExMe4vLzmtu"
+    }
+}
+
+```
+
+#### Modify existing menu items
+
+##### PUT - /admin/products
+
+###### Request
+
+```
+{
+    "title": "Te", // optional, must be between 2 and 30 characters
+    "desc": "Grönt te från AirBean", // optional, must be between 5 and 50 characters
+    "price": 15 // optinal, must be a number
+    "productID": "jgNTTExMe4vLzmtu" // required, must be exactly 16 characters
+}
+```
+
+###### Response
+
+```
+{
+    "message": "Product updated successfully",
+    "product": {
+        "title": "Te",
+        "desc": "Grönt te fron AirBean",
+        "price": 15,
+        "createAt": "2024-06-14 15:08:28",
+        "modifiedAt": "2024-06-14 15:20:51",
+        "_id": "jgNTTExMe4vLzmtu"
+    }
+}
+```
+
+#### Remove products from the menu
+
+##### DELETE - /admin/products
+
+###### Request
+
+```
+{
+    "productID": "jgNTTExMe4vLzmtu" // required, must be exactly 16 characters
+}
+```
+
+###### Response
+
+```
+{
+    "message": "Product deleted successfully"
+}
+```
+
+#### Create discount
+
+##### POST - /admin/products/dicount
+
+###### Request
+
+```
+{
+    "title": "Cortado & Flat White", // required, must be between 2 and 30 characters
+    "productID": ["0Gu3mPAbONk1hy4P", "3IBqddqDtbAtIi2E"], // required, must be atleast 1 product
+    "discountPrice": 30 // required, must be a number
+}
+
+```
+
+###### Response
+
+```
+{
+    "message": "Discount added successfully",
+    "discount": {
+        "title": "Cortado & Flat White",
+        "products": [ "Cortado","Flat White" ],
+        "discountPrice": 30,
+        "_id": "gh4yCkVX92cqweH0"
+    }
 }
 ```
